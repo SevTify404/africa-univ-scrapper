@@ -1,4 +1,7 @@
 from dataclasses import dataclass
+
+import aiohttp
+
 from helpers.fetch_university_info import fetch_university_info
 @dataclass
 class GoodUniversity:
@@ -21,9 +24,9 @@ class DirtUniversity:
             return ""
         return self.wikipdia_link.split("/")[-1]
 
-    async def get_full_info(self) -> GoodUniversity:
+    async def get_full_info(self, session: aiohttp.ClientSession) -> GoodUniversity:
         print("Récupération des infos pour: ", self.name)
-        info = await fetch_university_info(self.get_wikipedia_page_name())
+        info = await fetch_university_info(self.get_wikipedia_page_name(), session)
         return GoodUniversity(
             name=self.name,
             country=self.country,

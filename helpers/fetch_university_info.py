@@ -45,19 +45,18 @@ async def get_wikiidata_content(session: aiohttp.ClientSession, wikisata_id: str
             print("Erreur lors de la récupération du contenu Wikidata: ", e.__class__.__name__)
             return {}
 
-async def fetch_university_info(wikipedia_page_name) -> tuple[str, str | None] | None:
+async def fetch_university_info(wikipedia_page_name: str, session: aiohttp.ClientSession) -> tuple[str, str | None] | None:
     """Ordre : Date de création et ensuite site web"""
     if not wikipedia_page_name:
         return None
 
-    async with aiohttp.ClientSession() as session:
-        wikidata_id = await get_wikidata_id(session, wikipedia_page_name)
-        if not wikidata_id:
-            return None
+    wikidata_id = await get_wikidata_id(session, wikipedia_page_name)
+    if not wikidata_id:
+        return None
 
-        wikidata_content = await get_wikiidata_content(session, wikidata_id)
+    wikidata_content = await get_wikiidata_content(session, wikidata_id)
 
-        date_value = find_creation_date(wikidata_content, wikidata_id)
-        web_site_url = find_web_site_url(wikidata_content, wikidata_id)
+    date_value = find_creation_date(wikidata_content, wikidata_id)
+    web_site_url = find_web_site_url(wikidata_content, wikidata_id)
 
-        return date_value, web_site_url
+    return date_value, web_site_url

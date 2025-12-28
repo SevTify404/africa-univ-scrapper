@@ -3,15 +3,14 @@ from aiohttp import ClientSession
 from config import Config
 from DirtUniversity import DirtUniversity
 
-async def get_african_universities() -> list[DirtUniversity]:
+async def get_african_universities(session: ClientSession) -> list[DirtUniversity]:
 
     BASE_URL = Config.UNIVERSITY_PAGE_TO_SCRAP_LINK
 
     universities: list[DirtUniversity] = []
 
-    async with ClientSession(headers=Config.CUSTOM_HEADERS) as session:
-        async with session.get(BASE_URL) as response:
-            html_content = await response.text()
+    async with session.get(BASE_URL) as response:
+        html_content = await response.text()
 
     tree = HTMLParser(html_content)
 
