@@ -1,5 +1,3 @@
-import asyncio
-
 from selectolax.parser import HTMLParser
 from aiohttp import ClientSession
 from config import Config

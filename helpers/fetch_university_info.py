@@ -1,5 +1,3 @@
-import asyncio
-
 import aiohttp
 from config import Config
 async def get_wikidata_id(session: aiohttp.ClientSession, page_title: str) -> str | None:
@@ -20,17 +18,18 @@ async def get_wikidata_id(session: aiohttp.ClientSession, page_title: str) -> st
             return wikidata_id
     return None
 
-def find_web_site_url(claims: dict) -> str | None:
+
+def find_web_site_url(claims: dict, wikidata_id: str) -> str | None:
     PROPRIETE_WIKIDATA = "P856"
     try:
-        return claims[PROPRIETE_WIKIDATA][0]["mainsnak"]["datavalue"]["value"]
+        return claims['entities'][wikidata_id]['claims'][PROPRIETE_WIKIDATA][0]["mainsnak"]["datavalue"]["value"]
     except (KeyError, IndexError):
         return None
 
-def find_creation_date(claims: dict) -> str | None:
+def find_creation_date(claims: dict, wikidata_id: str) -> str | None:
     PROPRIETE_WIKIDATA = "P571"
     try:
-        date_value = claims[PROPRIETE_WIKIDATA][0]["mainsnak"]["datavalue"]["value"]["time"]
+        date_value = claims['entities'][wikidata_id]['claims'][PROPRIETE_WIKIDATA][0]["mainsnak"]["datavalue"]["value"]["time"]
         return date_value.lstrip("+").split("T")[0]
     except (KeyError, IndexError):
         return None
@@ -42,7 +41,8 @@ async def get_wikiidata_content(session: aiohttp.ClientSession, wikisata_id: str
             if response.status != 200:
                 return {}
             return await response.json()
-        except:
+        except Exception as e:
+            print("Erreur lors de la récupération du contenu Wikidata: ", e.__class__.__name__)
             return {}
 
 async def fetch_university_info(wikipedia_page_name) -> tuple[str, str | None] | None:
@@ -57,22 +57,7 @@ async def fetch_university_info(wikipedia_page_name) -> tuple[str, str | None] |
 
         wikidata_content = await get_wikiidata_content(session, wikidata_id)
 
-        date_value = find_creation_date(wikidata_content)
-        web_site_url = find_web_site_url(wikidata_content)
+        date_value = find_creation_date(wikidata_content, wikidata_id)
+        web_site_url = find_web_site_url(wikidata_content, wikidata_id)
 
         return date_value, web_site_url
-
-
-# async def geie():
-#     async with aiohttp.ClientSession() as session:
-#         info = await get_wikiidata_content(session, 'Q3551604')
-#         oo = find_creation_date(info)
-#         se = find_web_site_url(info)
-#         print(oo, se)
-#
-#     print(info)
-#
-#
-#
-#
-# asyncio.run(geie())
