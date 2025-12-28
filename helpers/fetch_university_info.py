@@ -38,9 +38,12 @@ def find_creation_date(claims: dict) -> str | None:
 
 async def get_wikiidata_content(session: aiohttp.ClientSession, wikisata_id: str) -> dict[str, str]:
     async with session.get(Config.WIKIDATA_API_URL.format(page_id=wikisata_id), headers=Config.CUSTOM_HEADERS) as response:
-        if response.status != 200:
+        try:
+            if response.status != 200:
+                return {}
+            return await response.json()
+        except:
             return {}
-        return await response.json()
 
 async def fetch_university_info(wikipedia_page_name) -> tuple[str, str | None] | None:
     """Ordre : Date de création et ensuite site web"""
