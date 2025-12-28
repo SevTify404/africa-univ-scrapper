@@ -3,13 +3,13 @@ import asyncio
 from selectolax.parser import HTMLParser
 from aiohttp import ClientSession
 from config import Config
-from University import University
+from DirtUniversity import DirtUniversity
 
-async def get_african_universities() -> list[University]:
+async def get_african_universities() -> list[DirtUniversity]:
 
-    BASE_URL = "https://aau.org/membership-list/#"
+    BASE_URL = Config.UNIVERSITY_PAGE_TO_SCRAP_LINK
 
-    universities: list[University] = []
+    universities: list[DirtUniversity] = []
 
     async with ClientSession(headers=Config.CUSTOM_HEADERS) as session:
         async with session.get(BASE_URL) as response:
@@ -29,9 +29,7 @@ async def get_african_universities() -> list[University]:
             univ_name = univ.text(strip=True)
             wikipedia_link = univ.css_first("a").attributes.get("href", "")
             universities.append(
-                University(name=univ_name, country=country_name, wikipdia_link=wikipedia_link)
+                DirtUniversity(name=univ_name, country=country_name, wikipdia_link=wikipedia_link)
             )
 
     return universities
-
-asyncio.run(get_african_universities())
