@@ -8,14 +8,15 @@ async def main():
     print(f"Universités total trouvé: {len(univs)}")
 
     final_univs: list[GoodUniversity] = []
-    # Requetes par batch de 25 universités pour optimisé
+    # Requetes par batch de 30 universités pour optimisé
 
     print("Debut de la récuperation des sites et date de création...")
-    batch_size = 25
+    batch_size = 35
     for i in range(0, len(univs), batch_size):
         batch = univs[i:i + batch_size]
         tasks = [univ.get_full_info() for univ in batch]
-        full_info_univs = await asyncio.gather(*tasks)
+        full_info_univs = await asyncio.gather(*tasks, return_exceptions=True)
+        full_info_univs = [u for u in full_info_univs if isinstance(u, GoodUniversity)]
         final_univs.extend(full_info_univs)
 
     print("Récuperation terminé, exportation vers CSV..")
