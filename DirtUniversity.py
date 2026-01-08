@@ -27,9 +27,16 @@ class DirtUniversity:
     async def get_full_info(self, session: aiohttp.ClientSession) -> GoodUniversity:
         print("Récupération des infos pour: ", self.name)
         info = await fetch_university_info(self.get_wikipedia_page_name(), session)
+        if not info:
+            return GoodUniversity(
+                name=self.name,
+                country=self.country,
+                create_date="Introuvable",
+                website_link="Introuvable"
+            )
         return GoodUniversity(
             name=self.name,
             country=self.country,
-            create_date=info[0] if info else "Introuvable",
-            website_link=info[1] if info else "Introuvable"
+            create_date=info[0],
+            website_link=info[1]
         )

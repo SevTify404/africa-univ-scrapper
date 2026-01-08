@@ -3,6 +3,14 @@ from aiohttp import ClientSession
 from config import Config
 from DirtUniversity import DirtUniversity
 
+def clean_unprocessable_univs(universities: list[DirtUniversity]) -> list[DirtUniversity]:
+    cleaned_univs = []
+    for univ in universities:
+        if univ.wikipdia_link not in ['#', '', None]:
+            cleaned_univs.append(univ)
+    return cleaned_univs
+
+
 async def get_african_universities(session: ClientSession) -> list[DirtUniversity]:
 
     BASE_URL = Config.UNIVERSITY_PAGE_TO_SCRAP_LINK
@@ -29,4 +37,4 @@ async def get_african_universities(session: ClientSession) -> list[DirtUniversit
                 DirtUniversity(name=univ_name, country=country_name, wikipdia_link=wikipedia_link)
             )
 
-    return universities
+    return clean_unprocessable_univs(universities)
